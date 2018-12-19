@@ -1,0 +1,13 @@
+target := gregame.wasm
+abi := $(target:.wasm=.abi)
+src := $(target:.wasm=.cpp)
+dep := $(target:.wasm=.hpp)
+
+
+default: $(target)
+
+$(target): $(src) $(dep)
+	eosio-cpp $(src) -o $(target) --abigen
+
+clean:
+	rm -rf $(target) $(abi)
