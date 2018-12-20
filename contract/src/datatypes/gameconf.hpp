@@ -1,7 +1,7 @@
 //raw included!
 
-//TABLE gameconf {
-struct gameconf {
+TABLE gameconf {
+//struct gameconf {
     uint64_t        game_id;            //仅用于存储，可使用固定值
     uint16_t        game_nr_p_min;      //起玩的最小人数
     uint16_t        game_nr_p_max;      //组的最多人数

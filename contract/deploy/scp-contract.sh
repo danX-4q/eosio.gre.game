@@ -2,6 +2,8 @@
 
 . deploy-danX.conf
 
+chmod +x *.sh
+
 scp ../src/*.abi ../src/*.wasm \
-    ./deploy-*.conf ./cleos-create-account.sh \
+    ./deploy-*.conf ./cleos-*.sh \
     $SSH_URL
