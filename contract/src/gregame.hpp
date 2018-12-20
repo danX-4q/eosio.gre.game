@@ -13,15 +13,30 @@
 #define ACTION_NAME__DELETE_GROUP d4group
 
 #include <eosiolib/eosio.hpp>
-
+#include<eosiolib/singleton.hpp>
 using namespace eosio;
 
 CONTRACT gregame : public eosio::contract {
     public:
         using contract::contract;
 
+        gregame(name receiver, name code,  datastream<const char*> ds);
         ACTION ACTION_NAME__CREATE_GROUP(name user);
+
+    private:
+        #include "datatypes/gameconf.hpp"       //受限于eosio.cdt的非常规用法
+        #include "datatypes/group.hpp"          //受限于eosio.cdt的非常规用法
+        typedef eosio::multi_index<"group"_n, group> type_table__group;
+        //typedef eosio::multi_index<"gameconf"_n, gameconf> type_table__gameconf;
+
+        typedef eosio::singleton<"gameconf"_n, gameconf> type_table__gameconf;
+        type_table__gameconf    tbl_gameconf;
+
+    private:
+        void init();
+
+
 };
 
 #endif
-//end-of-filed
+//end-of-file
