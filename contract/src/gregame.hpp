@@ -12,7 +12,11 @@
 #define ACTION_NAME__LEAVE_GROUP  l4group
 #define ACTION_NAME__DELETE_GROUP d4group
 
+#define CORE_SYMBOL "SYS"
+#define CORE_SYMBOL_P 4
+
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/asset.hpp>
 #include<eosiolib/singleton.hpp>
 using namespace eosio;
 
@@ -44,7 +48,7 @@ CONTRACT gregame : public eosio::contract {
 
     private:
         void init();
-
+        void test_asset_usage();
 
 };
 

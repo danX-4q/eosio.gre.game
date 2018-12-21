@@ -1,10 +1,11 @@
+#include <math.h>
 #include "gregame.hpp"
+
 using namespace eosio;
 
 #define DEBUG_PRINT_POS() print_f("% % %\n", __FILE__, __FUNCTION__, __LINE__)
 #define DEBUG_PRINT_VAR(x) print_f("% % %: "#x": %\n", __FILE__, __FUNCTION__, __LINE__, x)
 #define DEBUG_PRINTF(fmt, ...) printf("%s %s %d: " fmt "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
-
 
 gregame::gregame(name receiver, name code,  datastream<const char*> ds): 
     contract(receiver, code, ds),
@@ -13,6 +14,7 @@ gregame::gregame(name receiver, name code,  datastream<const char*> ds):
     bool    is_inited(false);
     DEBUG_PRINT_VAR(receiver);
     DEBUG_PRINT_VAR(code);
+    //test_asset_usage(); return;    
 
     is_inited = tbl_gameconf.exists();
     if (!is_inited) {
@@ -26,11 +28,32 @@ void gregame::init()
     gameconf    dlt_gc{
         0x64616e58, 
         5, 1000,
-        1*1000, 100*1000,   //*1000: 调整单位为小数点后4位
+        //1*1000, 100*1000,   //*1000: 调整单位为小数点后4位
+        {int64_t(0.5 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
+        {int64_t(100 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
         5
     };
     dlt_gc.print();
     tbl_gameconf.set(dlt_gc, _code);
+}
+
+void gregame::test_asset_usage()
+{
+    {
+        //编译通过，运行报错
+        //asset tmp{1,{}};DEBUG_PRINT_VAR(tmp);
+    }
+    {
+        //编译不通过
+        //asset tmp{2,{"SYS"}};DEBUG_PRINT_VAR(tmp);
+    }
+    {
+        asset tmp{3,{"SYS",4}};DEBUG_PRINT_VAR(tmp);
+    }
+    {
+        //编译不通过
+        //asset tmp4{"3.0000 SYS"};DEBUG_PRINT_VAR(tmp4);
+    }
 }
 
 ACTION gregame::ACTION_NAME__CREATE_GROUP (
