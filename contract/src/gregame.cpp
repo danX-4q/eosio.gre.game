@@ -40,7 +40,8 @@ ACTION gregame::ACTION_NAME__CREATE_GROUP (
 ){
     DEBUG_PRINT_POS();
     require_auth(grp_creator);
-    type_table__group tbl_group(grp_creator, "global"_n.value);
+    //type_table__group tbl_group(get_self(), "global"_n.value);
+    type_table__group tbl_group(get_self(), grp_creator.value);
 
     char    szMesg[512] = {0};
     auto    itr = tbl_group.find(grp_name.value);
