@@ -1,7 +1,7 @@
 //raw included!
 
 TABLE group {
-    capi_checksum256    grp_hash;           //组id，本质是一个哈希值
+    name                grp_name;           //组名称，本质是一个base32风格的标识符
     name                grp_creator;        //创建者的账户名称
     std::string         grp_topic;          //组的主题
     std::string         grp_desc;           //组的描述
@@ -14,6 +14,6 @@ TABLE group {
     
     uint64_t primary_key() const
     {
-        return *(uint64_t*)&grp_hash;
+        return (grp_name.value);
     }
 };

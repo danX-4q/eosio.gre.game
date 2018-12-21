@@ -21,16 +21,26 @@ CONTRACT gregame : public eosio::contract {
         using contract::contract;
 
         gregame(name receiver, name code,  datastream<const char*> ds);
-        ACTION ACTION_NAME__CREATE_GROUP(name user);
+        ACTION ACTION_NAME__CREATE_GROUP(
+            name        grp_name,
+            name        grp_creator,
+            std::string grp_topic,
+            std::string grp_desc,
+            uint16_t    grp_nr_p_min,
+            uint16_t    grp_nr_p_max,
+            uint32_t    grp_amp_min,
+            uint32_t    grp_amp_max,
+            uint8_t     grp_commission
+        );
 
     private:
         #include "datatypes/gameconf.hpp"       //受限于eosio.cdt的非常规用法
         #include "datatypes/group.hpp"          //受限于eosio.cdt的非常规用法
-        typedef eosio::multi_index<"group"_n, group> type_table__group;
-        //typedef eosio::multi_index<"gameconf"_n, gameconf> type_table__gameconf;
+        typedef eosio::multi_index<"group"_n, group>        type_table__group;
+        typedef eosio::singleton<"gameconf"_n, gameconf>    type_table__gameconf;
 
-        typedef eosio::singleton<"gameconf"_n, gameconf> type_table__gameconf;
         type_table__gameconf    tbl_gameconf;
+        //type_table__group       tbl_group;
 
     private:
         void init();
