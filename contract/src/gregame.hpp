@@ -17,7 +17,7 @@
 
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
-#include<eosiolib/singleton.hpp>
+#include <eosiolib/singleton.hpp>
 using namespace eosio;
 
 CONTRACT gregame : public eosio::contract {
@@ -32,8 +32,8 @@ CONTRACT gregame : public eosio::contract {
             std::string grp_desc,
             uint16_t    grp_nr_p_min,
             uint16_t    grp_nr_p_max,
-            uint32_t    grp_amp_min,
-            uint32_t    grp_amp_max,
+            asset       grp_amp_min,
+            asset       grp_amp_max,
             uint8_t     grp_commission
         );
 

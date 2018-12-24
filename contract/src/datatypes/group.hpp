@@ -7,8 +7,10 @@ TABLE group {
     std::string         grp_desc;           //组的描述
     uint16_t            grp_nr_p_min;       //起玩的最小人数
     uint16_t            grp_nr_p_max;       //组的最多人数
-    uint32_t            grp_amp_min;        //红包人均金额的最小值
-    uint32_t            grp_amp_max;        //红包人均金额的最大值
+    //uint32_t            grp_amp_min;        //红包人均金额的最小值
+    //uint32_t            grp_amp_max;        //红包人均金额的最大值
+    asset               grp_amp_min;
+    asset               grp_amp_max;
     uint8_t             grp_commission;     //红包被组创建者抽水的百分比
     uint8_t             grp_status;         //组的状态：0,正常；1,正常但不能进；2,解散
     

@@ -1,11 +1,8 @@
 #include <math.h>
 #include "gregame.hpp"
+#include "utility/printkit.hpp"
 
 using namespace eosio;
-
-#define DEBUG_PRINT_POS() print_f("% % %\n", __FILE__, __FUNCTION__, __LINE__)
-#define DEBUG_PRINT_VAR(x) print_f("% % %: "#x": %\n", __FILE__, __FUNCTION__, __LINE__, x)
-#define DEBUG_PRINTF(fmt, ...) printf("%s %s %d: " fmt "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 gregame::gregame(name receiver, name code,  datastream<const char*> ds): 
     contract(receiver, code, ds),
@@ -63,13 +60,18 @@ ACTION gregame::ACTION_NAME__CREATE_GROUP (
     std::string grp_desc,
     uint16_t    grp_nr_p_min,
     uint16_t    grp_nr_p_max,
-    uint32_t    grp_amp_min,
-    uint32_t    grp_amp_max,
+    asset       grp_amp_min,
+    asset       grp_amp_max,
     uint8_t     grp_commission
 ){
     DEBUG_PRINT_POS();
     DEBUG_PRINT_VAR(this->get_self());
     DEBUG_PRINT_VAR(this->_code);
+
+    DEBUG_PRINT_VAR(grp_amp_min.amount);
+    DEBUG_PRINT_VAR(grp_amp_max.amount);
+    DEBUG_PRINT_VAR(grp_amp_min);
+    DEBUG_PRINT_VAR(grp_amp_max);
 
     require_auth(grp_creator);
 
@@ -99,7 +101,8 @@ ACTION gregame::ACTION_NAME__CREATE_GROUP (
     for (auto itrStep = tbl_group.cbegin(); itrStep != tbl_group.cend(); ++itrStep) {
         ++size;
     }
-    DEBUG_PRINTF("%u", size);
+    DEBUG_PRINT_VAR(size);
+
     DEBUG_PRINT_POS();
 }
 
