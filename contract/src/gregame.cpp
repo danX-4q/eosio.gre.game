@@ -106,5 +106,52 @@ ACTION gregame::ACTION_NAME__CREATE_GROUP (
     DEBUG_PRINT_POS();
 }
 
-EOSIO_DISPATCH(gregame, (ACTION_NAME__CREATE_GROUP))
+ACTION gregame::ACTION_NAME__JOIN_GROUP(
+    name        grp_name,
+    name        grp_creator,
+    name        gm_account
+)
+{
+    //1. 待加入的群组是否存在及状态正常
+    type_table__group tbl_group(get_self(), grp_creator.value);
+    auto    itr = tbl_group.find(grp_name.value);
+    char    szMesg[512] = {0};
+    snprintf(szMesg, sizeof(szMesg)-1, 
+        "grp_name(%s)+grp_creator(%s) has not been created.", 
+        grp_name.to_string().c_str(),
+        grp_creator.to_string().c_str());
+    eosio_assert(itr != tbl_group.end(), szMesg);
+
+    require_auth(gm_account);
+    //2. 当前组员不在组中
+    type_table__groupmember tbl_groupmember(get_self(), gm_account.value);
+    auto groupname_index = tbl_groupmember.get_index<"groupname"_n>();
+    auto itr_a = groupname_index.lower_bound(grp_name.value);
+    for(; itr_a!= groupname_index.end(); ++itr_a){
+        snprintf(szMesg, sizeof(szMesg)-1, 
+            "gm_account(%s) has joind into grp_name(%s)+grp_creator(%s).", 
+            gm_account.to_string().c_str(),
+            grp_name.to_string().c_str(),
+            grp_creator.to_string().c_str());
+        eosio_assert(itr_a->grp_creator != grp_creator, szMesg);
+    }
+    //确认了，还未加入；继续后续流程：
+
+
+    //2. 当前组员转入抵押的资产
+
+
+    //3. 正确加入
+    tbl_groupmember.emplace(gm_account, [&]( auto& row ) {
+        row.id = tbl_groupmember.available_primary_key();
+        row.grp_name = grp_name;
+        row.grp_creator = grp_creator;
+        row.gm_account = gm_account;
+        row.gm_da = asset{0,{CORE_SYMBOL,CORE_SYMBOL_P}};
+        row.gm_status = 1;
+    });
+    
+}
+
+EOSIO_DISPATCH(gregame, (ACTION_NAME__CREATE_GROUP)(ACTION_NAME__JOIN_GROUP))
 //end-of-file

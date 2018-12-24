@@ -37,11 +37,21 @@ CONTRACT gregame : public eosio::contract {
             uint8_t     grp_commission
         );
 
+        ACTION ACTION_NAME__JOIN_GROUP(
+            name        grp_name,
+            name        grp_creator,
+            name        gm_account
+        );
+
     private:
         #include "datatypes/gameconf.hpp"       //受限于eosio.cdt的非常规用法
         #include "datatypes/group.hpp"          //受限于eosio.cdt的非常规用法
-        typedef eosio::multi_index<"group"_n, group>        type_table__group;
-        typedef eosio::singleton<"gameconf"_n, gameconf>    type_table__gameconf;
+        #include "datatypes/groupmember.hpp"    //受限于eosio.cdt的非常规用法
+        typedef eosio::multi_index<"group"_n, group>            type_table__group;
+        typedef eosio::singleton<"gameconf"_n, gameconf>        type_table__gameconf;
+        typedef eosio::multi_index<"groupmember"_n, groupmember, 
+            indexed_by<"groupname"_n, const_mem_fun<groupmember, uint64_t, &groupmember::get_grp_name>>
+        > type_table__groupmember;
 
     private:
         void init(type_table__gameconf &tbl_gameconf);
