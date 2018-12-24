@@ -135,19 +135,26 @@ ACTION gregame::ACTION_NAME__JOIN_GROUP(
             grp_creator.to_string().c_str());
         eosio_assert(itr_a->grp_creator != grp_creator, szMesg);
     }
-    //确认了，还未加入；继续后续流程：
+    //确认了，还未加入；可以继续后续流程：//////////////////////////////////////
 
 
-    //2. 当前组员转入抵押的资产
+    //3. 当前组员转入抵押的资产
+    asset gm_da = asset{int64_t(1.1 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}}; // equals to 1 EOS
 
+    action(
+        permission_level{gm_account, "active"_n},
+        "eosio.token"_n, "transfer"_n,
+        std::make_tuple(gm_account, _self, gm_da, std::string("some memo here"))
+    ).send();
 
-    //3. 正确加入
+    //4. 正确入群
     tbl_groupmember.emplace(gm_account, [&]( auto& row ) {
         row.id = tbl_groupmember.available_primary_key();
         row.grp_name = grp_name;
         row.grp_creator = grp_creator;
         row.gm_account = gm_account;
-        row.gm_da = asset{0,{CORE_SYMBOL,CORE_SYMBOL_P}};
+        //row.gm_da = asset{0,{CORE_SYMBOL,CORE_SYMBOL_P}};
+        row.gm_da = gm_da;
         row.gm_status = 1;
     });
     
