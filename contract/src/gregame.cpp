@@ -5,22 +5,22 @@
 using namespace eosio;
 
 gregame::gregame(name receiver, name code,  datastream<const char*> ds): 
-    contract(receiver, code, ds),
-    tbl_gameconf(code, code.value)
+    contract(receiver, code, ds)
 {
     bool    is_inited(false);
     DEBUG_PRINT_VAR(receiver);
     DEBUG_PRINT_VAR(code);
-    //test_asset_usage(); return;    
+    //test_asset_usage(); return;
 
+    type_table__gameconf    tbl_gameconf(code, code.value);
     is_inited = tbl_gameconf.exists();
     if (!is_inited) {
         //首次，需初始化
-        init();
+        init(tbl_gameconf);
     }
 }
 
-void gregame::init()
+void gregame::init(type_table__gameconf &tbl_gameconf)
 {
     gameconf    dlt_gc{
         0x64616e58, 

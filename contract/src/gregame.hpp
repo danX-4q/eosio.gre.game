@@ -43,11 +43,8 @@ CONTRACT gregame : public eosio::contract {
         typedef eosio::multi_index<"group"_n, group>        type_table__group;
         typedef eosio::singleton<"gameconf"_n, gameconf>    type_table__gameconf;
 
-        type_table__gameconf    tbl_gameconf;
-        //type_table__group       tbl_group;
-
     private:
-        void init();
+        void init(type_table__gameconf &tbl_gameconf);
         void test_asset_usage();
 
 };
