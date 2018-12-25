@@ -17,6 +17,11 @@ gregame::gregame(name receiver, name code,  datastream<const char*> ds):
     if (!is_inited) {
         //首次，需初始化
         init(tbl_gameconf);
+    } else {
+        #warning "调试-合约中跨用户操作数据表"
+        gameconf dlt_gc = tbl_gameconf.get();
+        dlt_gc.game_commission += 1;
+        tbl_gameconf.set(dlt_gc, _code);
     }
 }
 
@@ -76,8 +81,8 @@ ACTION gregame::ACTION_NAME__CREATE_GROUP (
     require_auth(grp_creator);
 
     //表格的主键,size等,都按照scope分流了
-    //type_table__group tbl_group(get_self(), "global"_n.value);
-    type_table__group tbl_group(get_self(), grp_creator.value);
+    type_table__group tbl_group(get_self(), "global"_n.value);
+    //type_table__group tbl_group(get_self(), grp_creator.value);
 
     char    szMesg[512] = {0};
     auto    itr = tbl_group.find(grp_name.value);
@@ -113,7 +118,8 @@ ACTION gregame::ACTION_NAME__JOIN_GROUP(
 )
 {
     //1. 待加入的群组是否存在及状态正常
-    type_table__group tbl_group(get_self(), grp_creator.value);
+    //type_table__group tbl_group(get_self(), grp_creator.value);
+    type_table__group tbl_group(get_self(), "global"_n.value);
     auto    itr = tbl_group.find(grp_name.value);
     char    szMesg[512] = {0};
     snprintf(szMesg, sizeof(szMesg)-1, 
@@ -124,7 +130,8 @@ ACTION gregame::ACTION_NAME__JOIN_GROUP(
 
     require_auth(gm_account);
     //2. 当前组员不在组中
-    type_table__groupmember tbl_groupmember(get_self(), gm_account.value);
+    //type_table__groupmember tbl_groupmember(get_self(), gm_account.value);
+    type_table__groupmember tbl_groupmember(get_self(), "global"_n.value);
     auto groupname_index = tbl_groupmember.get_index<"groupname"_n>();
     auto itr_a = groupname_index.lower_bound(grp_name.value);
     for(; itr_a!= groupname_index.end(); ++itr_a){
