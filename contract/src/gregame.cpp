@@ -167,5 +167,29 @@ ACTION gregame::ACTION_NAME__JOIN_GROUP(
     
 }
 
-EOSIO_DISPATCH(gregame, (ACTION_NAME__CREATE_GROUP)(ACTION_NAME__JOIN_GROUP))
+ACTION gregame::ACTION_NAME__JOIN_GROUP2(
+    name        grp_name,
+    name        grp_creator,
+    name        gm_account
+)
+{
+    //1. 待加入的群组是否存在及状态正常
+    //type_table__group tbl_group(get_self(), grp_creator.value);
+    type_table__group tbl_group(get_self(), "global"_n.value);
+    auto    itr = tbl_group.find(grp_name.value);
+    char    szMesg[512] = {0};
+    snprintf(szMesg, sizeof(szMesg)-1, 
+        "grp_name(%s)+grp_creator(%s) has not been created.", 
+        grp_name.to_string().c_str(),
+        grp_creator.to_string().c_str());
+    eosio_assert(itr != tbl_group.end(), szMesg);
+
+    DEBUG_PRINT_POS();
+    //require_auth(gm_account);
+    require_recipient(gm_account);
+    DEBUG_PRINT_POS();
+}
+
+
+EOSIO_DISPATCH(gregame, (ACTION_NAME__CREATE_GROUP)(ACTION_NAME__JOIN_GROUP)(ACTION_NAME__JOIN_GROUP2))
 //end-of-file

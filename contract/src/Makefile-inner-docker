@@ -3,10 +3,20 @@ abi := $(target:.wasm=.abi)
 src := $(target:.wasm=.cpp)
 dep := $(target:.wasm=.hpp) $(wildcard datatypes/*.hpp) $(wildcard utility/*.hpp)
 
-default: $(target)
+
+target2 := groupmember.wasm
+abi2 := $(target2:.wasm=.abi)
+src2 := $(target2:.wasm=.cpp)
+dep2 := $(target2:.wasm=.hpp) $(wildcard datatypes/*.hpp) $(wildcard utility/*.hpp)
+
+
+default: $(target) $(target2)
 
 $(target): $(src) $(dep)
 	eosio-cpp $(src) -o $(target) --abigen
 
+$(target2): $(src2) $(dep2)
+	eosio-cpp $(src2) -o $(target2) --abigen
+
 clean:
-	rm -rf $(target) $(abi)
+	rm -rf $(target) $(abi) $(target2) $(abi2)

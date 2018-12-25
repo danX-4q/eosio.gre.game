@@ -7,6 +7,7 @@
 //  '4', 此处用作分割符
 #define ACTION_NAME__CREATE_GROUP c4group
 #define ACTION_NAME__JOIN_GROUP   j4group
+#define ACTION_NAME__JOIN_GROUP2  j4group2
 #define ACTION_NAME__CREATE_R_E   c4re
 #define ACTION_NAME__GRAB_R_E     g4re
 #define ACTION_NAME__LEAVE_GROUP  l4group
@@ -38,6 +39,12 @@ CONTRACT gregame : public eosio::contract {
         );
 
         ACTION ACTION_NAME__JOIN_GROUP(
+            name        grp_name,
+            name        grp_creator,
+            name        gm_account
+        );
+
+        ACTION ACTION_NAME__JOIN_GROUP2(
             name        grp_name,
             name        grp_creator,
             name        gm_account
