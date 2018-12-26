@@ -177,9 +177,36 @@ ACTION gregame::AN__CREATE_RED_ENVELOPE(
     name        player
 )
 {
-    DEBUG_PRINT_POS();
-}
+    require_auth(player);
 
+    type_table__gameconf        tbl_gameconf(this->get_self(), this->get_self().value);
+    gameconf    gconf = tbl_gameconf.get();
+    
+    type_table__gameruntime     tbl_gameruntime(this->get_self(), this->get_self().value);
+    gameruntime grt = tbl_gameruntime.get();
+    EOSIO_ASSERT_EX(grt.grt_game_state == 0);
+
+    type_table__playbalance     tbl_playbalance(this->get_self(), this->get_self().value);
+    auto itr = tbl_playbalance.find(player.value);
+    EOSIO_ASSERT_EX(itr != tbl_playbalance.end());
+    EOSIO_ASSERT_EX(itr->balance >= gconf.game_re_amount);
+    tbl_playbalance.modify(itr, this->get_self(), [&]( auto& row ) {
+        row.player = player;
+        row.balance = itr->balance - gconf.game_re_amount;
+    });
+
+    type_table__redenvelope     tbl_redenvelope(this->get_self(), this->get_self().value);
+    tbl_redenvelope.emplace(this->get_self(), [&]( auto& row ) {
+        row.id = tbl_redenvelope.available_primary_key();
+        row.re_id = grt.grt_game_id;
+        row.re_creator = player;
+    });
+
+    grt.grt_m_total += gconf.game_m_cmsn;
+    grt.grt_p_total += gconf.game_p_cmsn;
+    grt.grt_game_state = 1;
+    tbl_gameruntime.set(grt, this->get_self());
+}
 
 extern "C" {
     bool recipient_hook(uint64_t receiver, uint64_t code, uint64_t action)
