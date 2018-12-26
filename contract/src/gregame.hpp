@@ -63,6 +63,35 @@ CONTRACT gregame : public eosio::contract {
 
     private:
         void init(type_table__gameconf &tbl_gameconf);
+
+        void rcpnt_transfer_to_p(
+            name        from,
+            name        to,
+            asset       quantity,
+            string      memo
+        );
+
+        void rcpnt_transfer_to_m(
+            name        from,
+            name        to,
+            asset       quantity,
+            string      memo
+        );
+
+        void rcpnt_transfer_to_player(
+            name        from,
+            name        to,
+            asset       quantity,
+            string      memo
+        );
+
+        void rcpnt_transfer_to_myself(
+            name        from,
+            name        to,
+            asset       quantity,
+            string      memo
+        );
+
 };
 
 #endif

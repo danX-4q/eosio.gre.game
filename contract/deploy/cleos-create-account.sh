@@ -4,6 +4,7 @@
 
 source ${EOSIO_ENV}
 cleos-a create account eosio gre12345game ${K6_PUB} -p eosio@active
+cleos-a create account eosio master53danx ${K6_PUB} -p eosio@active
 cleos-a create account eosio chenxd53danx ${K6_PUB} -p eosio@active
 cleos-a create account eosio gre53palyer1 ${K6_PUB} -p eosio@active
 cleos-a create account eosio gre53palyer2 ${K6_PUB} -p eosio@active

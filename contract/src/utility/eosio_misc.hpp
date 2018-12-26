@@ -14,3 +14,12 @@ extern "C" { \
    } \
 } \
  /// @}  dispatcher
+
+
+#define EOSIO_ASSERT_EX(x) { \
+   char  szMsg[512] = {0}; \
+   snprintf(szMsg, sizeof(szMsg)-1, \
+      "%s %s %d: eosio_assert: %s", \
+      __FILE__, __FUNCTION__, __LINE__, \
+      #x); \
+   eosio_assert((x), szMsg); }

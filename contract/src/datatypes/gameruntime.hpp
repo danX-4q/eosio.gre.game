@@ -5,10 +5,10 @@ TABLE gameruntime {
     uint16_t        grt_nr_player;      //当前局的玩家数量；相同player多次出现只计为1
     uint8_t         grt_game_state;     //当前局游戏的状态
 
-    asset           grt_m_total;        //组织者的累计佣金
-    asset           grt_m_refund;       //组织者已提走的佣金
-    asset           grt_p_total;        //组织者的累计佣金
-    asset           grt_p_refund;       //组织者已提走的佣金
+    asset           grt_m_total;        //组织者的累计佣金(应付)
+    asset           grt_m_refund;       //组织者已提走的佣金(已付)
+    asset           grt_p_total;        //组织者的累计佣金(应付)
+    asset           grt_p_refund;       //组织者已提走的佣金(已付)
     
     void print() const
     {

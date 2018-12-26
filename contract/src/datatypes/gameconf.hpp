@@ -7,7 +7,8 @@ TABLE gameconf {
     uint16_t        game_re_split;      //每个红包切分成几份
     asset           game_m_cmsn;        //每个红包被组织者提成的佣金
     asset           game_p_cmsn;        //每个红包被平台提成的佣金
-    name            game_p;             //平台佣金提成的账号
+    name            game_m;             //组织者佣金提成的账户
+    name            game_p;             //平台佣金提成的账户
 
     void print() const
     {
@@ -16,6 +17,7 @@ TABLE gameconf {
         DEBUG_PRINT_VAR(game_re_split);
         DEBUG_PRINT_VAR(game_m_cmsn);
         DEBUG_PRINT_VAR(game_p_cmsn);
+        DEBUG_PRINT_VAR(game_m);
         DEBUG_PRINT_VAR(game_p);
     }
 };
