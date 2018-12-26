@@ -45,6 +45,9 @@ void gregame::rcpnt_transfer(
     DEBUG_PRINT_VAR(from);
     DEBUG_PRINT_VAR(to);
 
+    //主要目的：确保是CORE_SYMBOL资产
+    eosio_assert(quantity > asset{0, {CORE_SYMBOL,CORE_SYMBOL_P}}, "");
+
     if (to == this->get_self()) {
         DEBUG_PRINT_VAR(quantity);
         //收到款
