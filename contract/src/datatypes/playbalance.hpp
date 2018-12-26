@@ -1,6 +1,6 @@
 //raw included!
 
-TABLE playerbalance {
+TABLE playbalance {
     name            player;             //玩家账户
     asset           balance;            //当前存于合约的余额
 

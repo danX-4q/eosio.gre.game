@@ -9,7 +9,7 @@ gregame::gregame(name receiver, name code,  datastream<const char*> ds):
 {
     DEBUG_PRINT_VAR(receiver);
     DEBUG_PRINT_VAR(code);
-    DEBUG_PRINT_VAR(this->_self);
+    DEBUG_PRINT_VAR(this->get_self());
 
     bool    is_inited(false);
     type_table__gameconf    tbl_gameconf(receiver, receiver.value); //support: action+recipent
@@ -31,7 +31,7 @@ void gregame::init(type_table__gameconf &tbl_gameconf)
         .game_p = "chenxd53danx"_n,
     };
     dlt_gc.print();
-    tbl_gameconf.set(dlt_gc, this->_self);
+    tbl_gameconf.set(dlt_gc, this->get_self());
 }
 
 void gregame::rcpnt_transfer(
@@ -42,6 +42,32 @@ void gregame::rcpnt_transfer(
 )
 {
     DEBUG_PRINT_POS();
+    DEBUG_PRINT_VAR(from);
+    DEBUG_PRINT_VAR(to);
+
+    if (to == this->get_self()) {
+        DEBUG_PRINT_VAR(quantity);
+        //收到款
+        type_table__playbalance   tbl_playbalance(this->get_self(), this->get_self().value);
+        auto itr = tbl_playbalance.find(from.value);
+        if (itr == tbl_playbalance.end()) {
+            //首次转账
+            tbl_playbalance.emplace(this->get_self(), [&]( auto& row ) {
+                row.player = from;
+                row.balance = quantity;
+            });
+        } else {
+            //非首次转账
+            tbl_playbalance.modify(itr, this->get_self(), [&]( auto& row ) {
+                row.player = from;
+                row.balance = itr->balance + quantity;
+            });            
+        }
+
+    } else if (from == this->get_self()) {
+        //转出款
+        //require_auth(from);
+    }
 }
 
 ACTION gregame::AN__CREATE_RED_ENVELOPE(

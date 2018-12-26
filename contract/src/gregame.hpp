@@ -58,8 +58,8 @@ CONTRACT gregame : public eosio::contract {
         #include "datatypes/gameruntime.hpp"    //受限于eosio.cdt的非常规用法
         typedef eosio::singleton<"gameruntime"_n, gameruntime>  type_table__gameruntime;
         
-        #include "datatypes/playerbalance.hpp"  //受限于eosio.cdt的非常规用法
-        typedef eosio::multi_index<"playerbalance"_n, playerbalance> type_table__playerbalance;
+        #include "datatypes/playbalance.hpp"  //受限于eosio.cdt的非常规用法
+        typedef eosio::multi_index<"playbalance"_n, playbalance> type_table__playbalance;
 
     private:
         void init(type_table__gameconf &tbl_gameconf);

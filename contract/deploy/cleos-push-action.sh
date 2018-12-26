@@ -3,6 +3,7 @@
 . deploy-danX.conf
 source ${EOSIO_ENV}
 
+set -x
 
 function pre() {
     cleos-a transfer eosio gre53palyer1 "1000.0000 SYS"
