@@ -208,6 +208,40 @@ ACTION gregame::AN__CREATE_RED_ENVELOPE(
     tbl_gameruntime.set(grt, this->get_self());
 }
 
+ACTION gregame::AN__GRAB_RED_ENVELOPE(
+    name        player,
+    uint16_t    re_num
+)
+{
+    require_auth(player);
+
+    type_table__gameruntime     tbl_gameruntime(this->get_self(), this->get_self().value);
+    gameruntime grt = tbl_gameruntime.get();
+    EOSIO_ASSERT_EX(grt.grt_game_state == 1);
+
+    type_table__grabre          tbl_grabre(this->get_self(), this->get_self().value);
+    auto reid_index = tbl_grabre.get_index<"reid"_n>();
+    auto itr_a = reid_index.lower_bound(grt.grt_game_id);
+    for(; itr_a!= reid_index.end(); ++itr_a){
+        EOSIO_ASSERT_EX(itr_a->re_player != player);
+    }
+    tbl_grabre.emplace(this->get_self(), [&]( auto& row ) {
+        row.id = tbl_grabre.available_primary_key();
+        row.re_id = grt.grt_game_id;
+        row.re_pos = grt.grt_nr_player;
+        row.re_player = player;
+        row.re_num = re_num;
+    });
+
+    type_table__gameconf        tbl_gameconf(this->get_self(), this->get_self().value);
+    gameconf    gconf = tbl_gameconf.get();
+    grt.grt_nr_player += 1;
+    if (grt.grt_nr_player == gconf.game_re_split) {
+        grt.grt_game_state = 2;
+    }
+    tbl_gameruntime.set(grt, this->get_self());
+}
+
 extern "C" {
     bool recipient_hook(uint64_t receiver, uint64_t code, uint64_t action)
     {

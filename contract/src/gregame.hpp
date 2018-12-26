@@ -37,7 +37,7 @@ CONTRACT gregame : public eosio::contract {
 
         ACTION AN__GRAB_RED_ENVELOPE(
             name        player,
-            uint16_t    re_num_a
+            uint16_t    re_num
         );
 
         ACTION AN__TERM_RED_ENVELOPE(
@@ -65,6 +65,11 @@ CONTRACT gregame : public eosio::contract {
         typedef eosio::multi_index<"redenvelope"_n, redenvelope, 
             eosio::indexed_by<"redenvelope"_n, eosio::const_mem_fun<redenvelope, uint64_t, &redenvelope::get_re_id>>
         > type_table__redenvelope;
+
+        #include "datatypes/grabre.hpp"         //受限于eosio.cdt的非常规用法
+        typedef eosio::multi_index<"grabre"_n, grabre, 
+            eosio::indexed_by<"reid"_n, eosio::const_mem_fun<grabre, uint64_t, &grabre::get_re_id>>
+        > type_table__grabre;
 
     private:
         void init(type_table__gameconf &tbl_gameconf);
@@ -96,7 +101,6 @@ CONTRACT gregame : public eosio::contract {
             asset       quantity,
             string      memo
         );
-
 };
 
 #endif
