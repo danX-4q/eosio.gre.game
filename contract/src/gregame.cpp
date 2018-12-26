@@ -7,11 +7,12 @@ using namespace eosio;
 gregame::gregame(name receiver, name code,  datastream<const char*> ds): 
     contract(receiver, code, ds)
 {
-    bool    is_inited(false);
     DEBUG_PRINT_VAR(receiver);
     DEBUG_PRINT_VAR(code);
+    DEBUG_PRINT_VAR(this->_self);
 
-    type_table__gameconf    tbl_gameconf(code, code.value);
+    bool    is_inited(false);
+    type_table__gameconf    tbl_gameconf(receiver, receiver.value); //support: action+recipent
     is_inited = tbl_gameconf.exists();
     if (!is_inited) {
         //首次，需初始化
@@ -30,10 +31,10 @@ void gregame::init(type_table__gameconf &tbl_gameconf)
         .game_p = "chenxd53danx"_n,
     };
     dlt_gc.print();
-    tbl_gameconf.set(dlt_gc, _code);
+    tbl_gameconf.set(dlt_gc, this->_self);
 }
 
-void gregame::transfer(
+void gregame::rcpnt_transfer(
     name        from,
     name        to,
     asset       quantity,
@@ -57,7 +58,7 @@ extern "C" {
         if( code != receiver &&
             code == name("eosio.token").value && 
             action == name("transfer").value) {
-            execute_action(name(receiver), name(code), &gregame::transfer);
+            execute_action(name(receiver), name(code), &gregame::rcpnt_transfer);
             return (false);
         } else {
             return (true);

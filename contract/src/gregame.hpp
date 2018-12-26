@@ -44,7 +44,7 @@ CONTRACT gregame : public eosio::contract {
             name        game_master
         );
 
-        void transfer(
+        void rcpnt_transfer(
             name        from,
             name        to,
             asset       quantity,
@@ -63,7 +63,6 @@ CONTRACT gregame : public eosio::contract {
 
     private:
         void init(type_table__gameconf &tbl_gameconf);
-
 };
 
 #endif
