@@ -37,9 +37,21 @@ void PrintAble<uint16_t>::print() const
     printui(m_x);
 }
 
+template<>
+void PrintAble<uint64_t>::print() const
+{
+    printui(m_x);
+}
+
+template<>
+void PrintAble<uint8_t>::print() const
+{
+    printui(m_x);
+}
+
 ////////////////////////////////////////////////////////////
 
-#define DEBUG_PRINT_POS() print_f("% % %\n", __FILE__, __FUNCTION__, __LINE__)
-#define DEBUG_PRINT_VAR(x) print_f("% % %: "#x": %\n", __FILE__, __FUNCTION__, __LINE__, PrintAble(x))
+#define DEBUG_PRINT_POS() eosio::print_f("% % %\n", __FILE__, __FUNCTION__, __LINE__)
+#define DEBUG_PRINT_VAR(x) eosio::print_f("% % %: "#x": %\n", __FILE__, __FUNCTION__, __LINE__, PrintAble(x))
 
 #endif  //__FILE_PRINTKIT_HPP__

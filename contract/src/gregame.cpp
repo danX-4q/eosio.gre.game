@@ -1,6 +1,6 @@
 #include <math.h>
 #include "gregame.hpp"
-#include "utility/printkit.hpp"
+#include "utility/eosio_dispatch_rhook.hpp"
 
 using namespace eosio;
 
@@ -10,54 +10,66 @@ gregame::gregame(name receiver, name code,  datastream<const char*> ds):
     bool    is_inited(false);
     DEBUG_PRINT_VAR(receiver);
     DEBUG_PRINT_VAR(code);
-    //test_asset_usage(); return;
 
     type_table__gameconf    tbl_gameconf(code, code.value);
     is_inited = tbl_gameconf.exists();
     if (!is_inited) {
         //首次，需初始化
         init(tbl_gameconf);
-    } else {
-        #warning "调试-合约中跨用户操作数据表"
-        gameconf dlt_gc = tbl_gameconf.get();
-        dlt_gc.game_commission += 1;
-        tbl_gameconf.set(dlt_gc, _code);
     }
 }
 
 void gregame::init(type_table__gameconf &tbl_gameconf)
 {
     gameconf    dlt_gc{
-        0x64616e58, 
-        5, 1000,
-        //1*1000, 100*1000,   //*1000: 调整单位为小数点后4位
-        {int64_t(0.5 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
-        {int64_t(100 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
-        5
+        .game_magic = 0x64616e58, //hex: danX
+        .game_re_amount = {int64_t(4 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
+        .game_re_split = 3,
+        .game_m_cmsn = {int64_t(0.4 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
+        .game_p_cmsn = {int64_t(0.6 * pow(10,CORE_SYMBOL_P)), {CORE_SYMBOL,CORE_SYMBOL_P}},
+        .game_p = "chenxd53danx"_n,
     };
     dlt_gc.print();
     tbl_gameconf.set(dlt_gc, _code);
 }
 
-void gregame::test_asset_usage()
+void gregame::transfer(
+    name        from,
+    name        to,
+    asset       quantity,
+    string      memo
+)
 {
-    {
-        //编译通过，运行报错
-        //asset tmp{1,{}};DEBUG_PRINT_VAR(tmp);
-    }
-    {
-        //编译不通过
-        //asset tmp{2,{"SYS"}};DEBUG_PRINT_VAR(tmp);
-    }
-    {
-        asset tmp{3,{"SYS",4}};DEBUG_PRINT_VAR(tmp);
-    }
-    {
-        //编译不通过
-        //asset tmp4{"3.0000 SYS"};DEBUG_PRINT_VAR(tmp4);
-    }
+    DEBUG_PRINT_POS();
 }
 
+ACTION gregame::AN__CREATE_RED_ENVELOPE(
+    name        player
+)
+{
+    DEBUG_PRINT_POS();
+}
+
+
+extern "C" {
+    bool recipient_hook(uint64_t receiver, uint64_t code, uint64_t action)
+    {
+        if( code != receiver &&
+            code == name("eosio.token").value && 
+            action == name("transfer").value) {
+            execute_action(name(receiver), name(code), &gregame::transfer);
+            return (false);
+        } else {
+            return (true);
+        }
+
+
+    }
+}//extern "C"
+
+EOSIO_DISPATCH_RHOOK(gregame, (AN__CREATE_RED_ENVELOPE))
+
+#if 0
 ACTION gregame::ACTION_NAME__CREATE_GROUP (
     name        grp_name,
     name        grp_creator,
@@ -190,6 +202,7 @@ ACTION gregame::ACTION_NAME__JOIN_GROUP2(
     DEBUG_PRINT_POS();
 }
 
-
 EOSIO_DISPATCH(gregame, (ACTION_NAME__CREATE_GROUP)(ACTION_NAME__JOIN_GROUP)(ACTION_NAME__JOIN_GROUP2))
+#endif
+
 //end-of-file
