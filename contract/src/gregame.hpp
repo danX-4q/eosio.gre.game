@@ -37,7 +37,7 @@ CONTRACT gregame : public eosio::contract {
 
         ACTION AN__GRAB_RED_ENVELOPE(
             name        player,
-            uint16_t    re_num
+            uint16_t    re_play_num
         );
 
         ACTION AN__TERM_RED_ENVELOPE(

@@ -210,7 +210,7 @@ ACTION gregame::AN__CREATE_RED_ENVELOPE(
 
 ACTION gregame::AN__GRAB_RED_ENVELOPE(
     name        player,
-    uint16_t    re_num
+    uint16_t    re_play_num
 )
 {
     require_auth(player);
@@ -233,39 +233,41 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
     for(; itr_a!= reid_index.end(); ++itr_a){
         EOSIO_ASSERT_EX(itr_a->re_player != player);
     }
+    auto grabre_id = tbl_grabre.available_primary_key();
     tbl_grabre.emplace(this->get_self(), [&]( auto& row ) {
-        row.id = tbl_grabre.available_primary_key();
+        row.id = grabre_id;
         row.re_id = grt.grt_game_id;
         row.re_pos = grt.grt_nr_player;
         row.re_player = player;
-        row.re_num = re_num;
+        row.re_play_num = re_play_num;
+        row.re_amount = asset{0, {CORE_SYMBOL,CORE_SYMBOL_P}};
     });
     grt.grt_nr_player += 1;
     if (grt.grt_nr_player == gconf.game_re_split) {
         grt.grt_game_state = 2;
-
+        DEBUG_PRINT_POS();
         //最后一个红包被抢后，合约自动入账
         //1. 分红包
         #warning "示例程序，使用简单的算法而已"
         itr_a = reid_index.lower_bound(grt.grt_game_id);
-        uint64_t    salt = 0;
+        uint64_t    salt = gconf.game_magic;
         uint128_t   total = 0;
         std::vector<uint64_t> salt_num;
         for(; itr_a!= reid_index.end(); ++itr_a){
-            uint64_t H32 = (salt & 0x00ffffff00000000UL) >> 32; //其实只留了24位
-            uint64_t L32 = salt & 0x00000000ffffffffUL;
+            uint64_t H32 = (salt & 0x00ffffff00000000UL) >> 32; //其实只保留了24位
+            uint64_t L32 = salt & 0x00000000000ffffffUL;        //其实只保留了24位
             salt = (L32 << 32) | H32;
             salt ^= itr_a->re_player.value;
-            salt |= itr_a->re_num;
+            salt |= itr_a->re_play_num;
             if(salt == 0) { salt = itr_a->re_player.value; }
             total += salt;
             salt_num.push_back(salt);
         }
 
-        std::vector<uint64_t> re_amount;
         asset   left = gconf.game_re_amount - gconf.game_m_cmsn - gconf.game_p_cmsn;
+        size_t i = 0;
         itr_a = reid_index.lower_bound(grt.grt_game_id);
-        for(size_t i = 0; i < salt_num.size() - 1; ++i, ++itr_a){
+        for(; i < salt_num.size() - 1; ++i, ++itr_a){
             int64_t amount = int64_t(double(salt_num[i]) / total);
             EOSIO_ASSERT_EX(left.amount > amount);
             left.amount -= amount;
@@ -276,13 +278,26 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
                 row.player = itr_a->re_player;
                 row.balance = itr->balance + asset{amount, {CORE_SYMBOL,CORE_SYMBOL_P}};
             });
-        }
+            auto itr_b = tbl_grabre.find(grabre_id);
+            EOSIO_ASSERT_EX(itr_b != tbl_grabre.end());
+            tbl_grabre.modify(itr_b, this->get_self(), [&]( auto& row ) {
+                row.re_salt_num = salt_num[i];
+                row.re_amount = asset{amount, {CORE_SYMBOL,CORE_SYMBOL_P}};
+            });
+
+        }//for ...
         EOSIO_ASSERT_EX(left.amount > 0);
         auto itr = tbl_playbalance.find(itr_a->re_player.value);
         EOSIO_ASSERT_EX(itr != tbl_playbalance.end());
         tbl_playbalance.modify(itr, this->get_self(), [&]( auto& row ) {
             row.player = itr_a->re_player;
             row.balance = itr->balance + left;
+        });
+        auto itr_b = tbl_grabre.find(grabre_id);
+        EOSIO_ASSERT_EX(itr_b != tbl_grabre.end());
+        tbl_grabre.modify(itr_b, this->get_self(), [&]( auto& row ) {
+            row.re_salt_num = salt_num[i];
+            row.re_amount = left;
         });
 
         //2. 重置状态
@@ -307,6 +322,6 @@ extern "C" {
     }
 }//extern "C"
 
-EOSIO_DISPATCH_RHOOK(gregame, (AN__CREATE_RED_ENVELOPE))
+EOSIO_DISPATCH_RHOOK(gregame, (AN__CREATE_RED_ENVELOPE)(AN__GRAB_RED_ENVELOPE))
 
 //end-of-file
