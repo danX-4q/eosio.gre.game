@@ -260,15 +260,20 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
             salt ^= itr_a->re_player.value;
             salt |= itr_a->re_play_num;
             if(salt == 0) { salt = itr_a->re_player.value; }
+            DEBUG_PRINT_VAR(salt);
             total += salt;
             salt_num.push_back(salt);
         }
+        DEBUG_PRINT_VAR(total);
 
-        asset   left = gconf.game_re_amount - gconf.game_m_cmsn - gconf.game_p_cmsn;
+        asset   re_real_total = gconf.game_re_amount - gconf.game_m_cmsn - gconf.game_p_cmsn;
+        asset   left = re_real_total;
         size_t i = 0;
         itr_a = reid_index.lower_bound(grt.grt_game_id);
         for(; i < salt_num.size() - 1; ++i, ++itr_a){
-            int64_t amount = int64_t(double(salt_num[i]) / total);
+            int64_t amount = int64_t(re_real_total.amount * double(salt_num[i]) / total);
+            DEBUG_PRINT_VAR(amount);
+
             EOSIO_ASSERT_EX(left.amount > amount);
             left.amount -= amount;
 
@@ -278,12 +283,23 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
                 row.player = itr_a->re_player;
                 row.balance = itr->balance + asset{amount, {CORE_SYMBOL,CORE_SYMBOL_P}};
             });
-            auto itr_b = tbl_grabre.find(grabre_id);
-            EOSIO_ASSERT_EX(itr_b != tbl_grabre.end());
-            tbl_grabre.modify(itr_b, this->get_self(), [&]( auto& row ) {
-                row.re_salt_num = salt_num[i];
-                row.re_amount = asset{amount, {CORE_SYMBOL,CORE_SYMBOL_P}};
-            });
+
+            //注意，这里不能使用grabre_id！
+            auto itr_b = reid_index.lower_bound(grt.grt_game_id);
+            for(; itr_b != reid_index.end(); ++itr_b){
+                DEBUG_PRINT_POS();
+                if(itr_b->re_pos == i){
+                    DEBUG_PRINT_VAR(itr_b->id);
+                    auto itr_c = tbl_grabre.find(itr_b->id);
+                    EOSIO_ASSERT_EX(itr_c != tbl_grabre.end());
+                    tbl_grabre.modify(itr_c, this->get_self(), [&]( auto& row ) {
+                        row.re_salt_num = salt_num[i];
+                        row.re_amount = asset{amount, {CORE_SYMBOL,CORE_SYMBOL_P}};
+                    });
+                    break;
+                }
+            }
+            EOSIO_ASSERT_EX(itr_b != reid_index.end());
 
         }//for ...
         EOSIO_ASSERT_EX(left.amount > 0);
