@@ -19,7 +19,9 @@ function pre() {
 }
 
 function post() {
-    :
+    cleos-a transfer gre12345game master53danx "0.8000 SYS" -p gre12345game@active && 
+    cleos-a transfer gre12345game chenxd53danx "1.0000 SYS" -p gre12345game@active &&
+    cleos-a transfer gre12345game chenxd53danx "0.2000 SYS" -p gre12345game@active
 }
 
 function ts_1() {
