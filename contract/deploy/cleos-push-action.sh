@@ -62,7 +62,15 @@ function ts_2() {
     cleos-a push action gre12345game g4r4e '["gre53palyer2", "564"]' -p gre53palyer2@active
     cleos-a push action gre12345game g4r4e '["gre53palyer3", "1498"]' -p gre53palyer3@active
         #红包已抢完；状态不对，抛出异常
-    cleos-a push action gre12345game g4r4e '["gre53palyer2", "564"]' -p gre53palyer2@active
+    cleos-a push action gre12345game g4r4e '["gre53palyer2", "777"]' -p gre53palyer2@active
+
+    #连封第二个红包
+    cleos-a push action gre12345game c4r4e '["gre53palyer2"]' -p gre53palyer2@active
+
+    #正常抢完
+    cleos-a push action gre12345game g4r4e '["gre53palyer1", "253"]' -p gre53palyer1@active &&
+    cleos-a push action gre12345game g4r4e '["gre53palyer2", "567"]' -p gre53palyer2@active &&
+    cleos-a push action gre12345game g4r4e '["gre53palyer3", "5678"]' -p gre53palyer3@active
 }
 
 pre

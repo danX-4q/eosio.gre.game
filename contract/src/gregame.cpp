@@ -42,6 +42,7 @@ void gregame::init(type_table__gameconf &tbl_gameconf)
     type_table__gameruntime     tbl_gameruntime(this->get_self(), this->get_self().value);
     gameruntime dlt_grt{
         .grt_game_id = 0,
+        .grt_re_salt = dlt_gc.game_magic,
         .grt_nr_player = 0,
         .grt_game_state = 0,
         .grt_m_total = {0, {CORE_SYMBOL,CORE_SYMBOL_P}},
@@ -250,16 +251,17 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
         //1. 分红包
         #warning "示例程序，使用简单的算法而已"
         itr_a = reid_index.lower_bound(grt.grt_game_id);
-        uint64_t    salt = gconf.game_magic;
+        uint64_t    salt = grt.grt_re_salt;
         uint128_t   total = 0;
         std::vector<uint64_t> salt_num;
         for(; itr_a!= reid_index.end(); ++itr_a){
-            uint64_t H32 = (salt & 0x00ffffff00000000UL) >> 32; //其实只保留了24位
-            uint64_t L32 = salt & 0x00000000000ffffffUL;        //其实只保留了24位
-            salt = (L32 << 32) | H32;
             salt ^= itr_a->re_player.value;
+            salt <<= (itr_a->re_play_num % 7) + 1;
             salt |= itr_a->re_play_num;
-            if(salt == 0) { salt = itr_a->re_player.value; }
+            uint64_t    hi4 = (salt & 0xf000000000000000UL) >> 28;
+            uint64_t    low28 = salt & 0x0fffffffffffffffUL;
+            salt = (low28 << 4) | hi4;
+            if(salt == 0) { salt = gconf.game_magic + grt.grt_game_id; }
             DEBUG_PRINT_VAR(salt);
             total += salt;
             salt_num.push_back(salt);
@@ -318,6 +320,7 @@ ACTION gregame::AN__GRAB_RED_ENVELOPE(
 
         //2. 重置状态
         grt.grt_game_id += 1;
+        grt.grt_re_salt = salt;
         grt.grt_nr_player = 0;
         grt.grt_game_state = 0;
     }
